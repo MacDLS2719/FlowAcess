@@ -22,6 +22,7 @@ class AvailabilityResource extends Resource
     protected static ?string $navigationLabel = 'Fechas Habilitadas';
     protected static ?string $pluralModelLabel = 'Fechas Habilitadas';
     protected static ?string $modelLabel = 'Fechas Habilitadas';
+    protected static ?string $navigationGroup = 'Operaciones';
 
     public static function form(Form $form): Form
     {

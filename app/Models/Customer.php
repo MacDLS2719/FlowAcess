@@ -15,7 +15,8 @@ class Customer extends Model
         'Telefono',
         'Sexo',
         'Tipo',
-        'EstadoCustomer',
+        'EstadoContable',
+        'EstadoGeneral',
         'CodigoCustomer',
     ];
 

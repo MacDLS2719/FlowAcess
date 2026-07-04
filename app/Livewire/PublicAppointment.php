@@ -14,73 +14,107 @@ class PublicAppointment extends Component
     public $fechaSeleccionada;
     public $horarioSeleccionado;
     public $mostrarAgenda = false;
+    public $modoReagendar = false;
+    public $appointmentActual;
+    public $showModal = false;
+    public $confirmData = [];
 
     public function validarCodigo()
     {
-        $this->customer = Customer::where(
-            'CodigoCustomer',
-            $this->codigo
-        )->first();
+        $this->customer = Customer::where('CodigoCustomer', $this->codigo)->first();
 
-        if (!$this->customer) {
-
-            $this->addError(
-                'codigo',
-                'Código no encontrado.'
-            );
-
+        if (! $this->customer) {
+            $this->addError('codigo', 'Código no encontrado.');
             return;
         }
 
-        $hasActiveOrFinishedAppointment = Appointment::where('IdCustomer', $this->customer->IdCustomer)
-            ->where(function ($query) {
-                // Bloquear si el EstadoAgen es nulo (cita futura/pendiente) o si es "Asistio"
-                $query->whereNull('EstadoAgen')
-                      ->orWhere('EstadoAgen', '!=', 'No asistio');
-            })
-            ->exists();
+        $this->appointmentActual = Appointment::where('IdCustomer', $this->customer->IdCustomer)
+            ->latest()
+            ->first();
 
-        if ($hasActiveOrFinishedAppointment) {
-            $this->addError('codigo', 'Ya tienes una cita activa o ya has asistido a una anteriormente.');
+        // =========================
+        // NO TIENE CITA
+        // =========================
+        if (! $this->appointmentActual) {
+            $this->mostrarAgenda = true;
             return;
         }
 
-        $this->mostrarAgenda = true;
+        // =========================
+        // PUEDE REAGENDAR
+        // =========================
+        if ($this->appointmentActual->Status === 'Reagendar') {
+            $this->modoReagendar = true;
+            $this->mostrarAgenda = true;
+            return;
+        }
+
+        // =========================
+        // BLOQUEO
+        // =========================
+        if ($this->appointmentActual->Status === 'Agendada') {
+            $this->addError('codigo', 'Ya tienes una cita activa.');
+            return;
+        }
+
+        // Cancelada → permite nueva cita
+        if ($this->appointmentActual->Status === 'Cancelada') {
+            $this->mostrarAgenda = true;
+            return;
+        }
     }
 
     public function guardarCita()
     {
-        $availability = Availability::find(
-            $this->horarioSeleccionado
-        );
+        $availability = Availability::find($this->horarioSeleccionado);
 
-        if (!$availability || $availability->Status == 1) {
-
-            $this->addError(
-                'horario',
-                'Horario no disponible.'
-            );
-
+        if (! $availability || $availability->Status == 1) {
+            $this->addError('horario', 'Horario no disponible.');
             return;
         }
 
-        Appointment::create([
-            'IdCustomer' => $this->customer->IdCustomer,
-            'IdAvailability' => $availability->IdAvailability,
-            'Status' => 'Agendada',
-            'Notes' => null,
-        ]);
+        // =========================
+        // REAGENDAR (EDITA EXISTENTE)
+        // =========================
+        if ($this->modoReagendar && $this->appointmentActual) {
 
+            // liberar anterior horario
+            Availability::where('IdAvailability', $this->appointmentActual->IdAvailability)
+                ->update(['Status' => 0]);
+
+            $this->appointmentActual->update([
+                'IdAvailability' => $availability->IdAvailability,
+                'Status' => 'Agendada',
+                'Notes' => null,
+            ]);
+
+        } else {
+
+            // =========================
+            // NUEVA CITA
+            // =========================
+            Appointment::create([
+                'IdCustomer' => $this->customer->IdCustomer,
+                'IdAvailability' => $availability->IdAvailability,
+                'Status' => 'Agendada',
+                'Notes' => null,
+            ]);
+        }
+
+        // bloquear nuevo horario
         $availability->update([
             'Status' => 1,
         ]);
 
-        session()->flash(
-            'success',
-            'Cita agendada correctamente.'
-        );
+        $this->confirmData = [
+            'nombre' => $this->customer->Nombre,
+            'codigo' => $this->customer->CodigoCustomer,
+            'fecha' => \Carbon\Carbon::parse($availability->AvailableDate)->format('Y-m-d'),
+            'hora' => \Carbon\Carbon::parse($availability->AvailableTime)->format('H:i')
+        ];
+        $this->showModal = true;
 
-        $this->reset();
+        $this->reset(['mostrarAgenda', 'modoReagendar']);
     }
 
     public function render()

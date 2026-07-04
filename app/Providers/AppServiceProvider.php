@@ -7,12 +7,10 @@ use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
+    
     public function register(): void
     {
-        //
+        $this->app->bind(LoginResponse::class, CustomLoginResponse::class);
     }
 
     /**

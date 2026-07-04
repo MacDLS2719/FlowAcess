@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'portal_title' => 'Portal de Agendamiento',
+    'welcome' => '¡Bienvenido!',
+    'enter_code' => 'Ingresa tu código para continuar',
+    'placeholder_code' => 'Ej: ADUL-15',
+    'validate_btn' => 'Validar Código',
+    'your_info' => 'Tu Información',
+    'name' => 'Nombre',
+    'phone' => 'Teléfono',
+    'code' => 'Código',
+    'type' => 'Tipo',
+    'select_date' => 'Selecciona fecha',
+    'select_time' => 'Selecciona horario',
+    'confirm_btn' => 'Confirmar Cita',
+    'confirmed_title' => '¡Cita Confirmada!',
+    'date' => 'Fecha',
+    'time' => 'Hora',
+    'warning_title' => '⚠️ Advertencia:',
+    'warning_text' => 'Por favor tomar foto o captura de este comprobante para presentar el día de su cita.',
+    'share_wa' => 'Compartir por WhatsApp',
+    'share_email' => 'Compartir por Gmail',
+    'print' => 'Imprimir / Captura',
+    'close' => 'Cerrar',
+];

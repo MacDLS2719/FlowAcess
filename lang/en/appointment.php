@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'portal_title' => 'Scheduling Portal',
+    'welcome' => 'Welcome!',
+    'enter_code' => 'Enter your code to continue',
+    'placeholder_code' => 'e.g. ADUL-15',
+    'validate_btn' => 'Validate Code',
+    'your_info' => 'Your Information',
+    'name' => 'Name',
+    'phone' => 'Phone',
+    'code' => 'Code',
+    'type' => 'Type',
+    'select_date' => 'Select date',
+    'select_time' => 'Select time',
+    'confirm_btn' => 'Confirm Appointment',
+    'confirmed_title' => 'Appointment Confirmed!',
+    'date' => 'Date',
+    'time' => 'Time',
+    'warning_title' => '⚠️ Warning:',
+    'warning_text' => 'Please take a photo or screenshot of this receipt to present on the day of your appointment.',
+    'share_wa' => 'Share via WhatsApp',
+    'share_email' => 'Share via Email',
+    'print' => 'Print / Screenshot',
+    'close' => 'Close',
+];

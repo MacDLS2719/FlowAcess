@@ -10,8 +10,9 @@ class CustomerForm extends Component
     public $Nombre;
     public $Telefono;
     public $Sexo;
-    public $Tipo; 
-    public $EstadoCustomer; 
+    public $Tipo;
+    public $EstadoContable;
+
     public $codigoGenerado;
     public $showModal = false;
     public $customerRegistrado;
@@ -21,7 +22,7 @@ class CustomerForm extends Component
         'Telefono' => 'required|string|max:11',
         'Sexo' => 'required|string',
         'Tipo' => 'required|in:Adulto,Niño',
-        'EstadoCustomer' => 'required|in:Pago,Debe',
+        'EstadoContable' => 'required|in:Pago,Debe',
     ];
 
     public function save()
@@ -33,15 +34,15 @@ class CustomerForm extends Component
             'Telefono' => $this->Telefono,
             'Sexo' => $this->Sexo,
             'Tipo' => $this->Tipo,
-            'EstadoCustomer' => $this->EstadoCustomer,
+            'EstadoContable' => $this->EstadoContable,
+            'EstadoGeneral' => 'Pendiente',
             'CodigoCustomer' => '',
         ]);
 
-        if ($this->Tipo === 'Adulto') {
-            $codigo = 'ADUL-' . $customer->IdCustomer;
-        } else {
-            $codigo = 'NIN-' . $customer->IdCustomer;
-        }
+        $codigo = match ($this->Tipo) {
+            'Adulto' => 'ADUL-' . $customer->IdCustomer,
+            'Niño' => 'NIN-' . $customer->IdCustomer,
+        };
 
         $customer->update([
             'CodigoCustomer' => $codigo,
@@ -51,7 +52,13 @@ class CustomerForm extends Component
         $this->codigoGenerado = $codigo;
         $this->showModal = true;
 
-        $this->reset(['Nombre','Telefono','Sexo','Tipo','EstadoCustomer']);
+        $this->reset([
+            'Nombre',
+            'Telefono',
+            'Sexo',
+            'Tipo',
+            'EstadoContable',
+        ]);
     }
 
     public function render()

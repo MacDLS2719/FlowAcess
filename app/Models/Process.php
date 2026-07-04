@@ -10,18 +10,25 @@ class Process extends Model
 
     protected $primaryKey = 'IdProcess';
 
-    public $timestamps = false;
-
     protected $fillable = [
         'IdCustomer',
-        'Estado',
-        'Fecha',
-        'Observacion',
-        'Historial',
+        'EstadoActual',
+        'FechaInicio',
+        'FechaCierre',
+    ];
+
+    protected $casts = [
+        'FechaInicio' => 'date',
+        'FechaCierre' => 'date',
     ];
 
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'IdCustomer', 'IdCustomer');
+    }
+
+    public function histories()
+    {
+        return $this->hasMany(ProcessHistory::class, 'IdProcess', 'IdProcess');
     }
 }
