@@ -56,6 +56,7 @@ RUN echo '#!/bin/sh' > /start.sh && \
     echo 'php artisan route:clear' >> /start.sh && \
     echo 'php artisan view:clear' >> /start.sh && \
     echo 'exec /usr/bin/supervisord -c /etc/supervisord.conf' >> /start.sh && \
+    echo 'php_flag[display_errors] = on' >> /etc/php82/php-fpm.d/www.conf
     chmod +x /start.sh
 
 EXPOSE 8080
