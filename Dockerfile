@@ -41,16 +41,32 @@ RUN npm install && npm run build
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
     chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Configurar Nginx y Supervisor
+# Configuración de Supervisor
 RUN mkdir -p /run/nginx
-COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
 
-# Crear el script de inicio que inyecta dinámicamente el $PORT de Railway en Nginx
+# Script de inicio inteligente: Escribe Nginx directamente usando el $PORT de Railway
 RUN echo '#!/bin/sh' > /start.sh && \
     echo 'PORT_TO_USE="${PORT:-8080}"' >> /start.sh && \
-    echo 'sed -i "s/listen [0-9]\+;/listen ${PORT_TO_USE};/g" /etc/nginx/nginx.conf' >> /start.sh && \
-    echo 'sed -i "s/listen \[[::\]]:[0-9]\+;/listen [::]:${PORT_TO_USE};/g" /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "worker_processes auto;" > /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "pid /run/nginx.pid;" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "events { worker_connections 1024; }" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "http {" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "    include /etc/nginx/mime.types;" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "    default_type application/octet-stream;" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "    sendfile on;" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "    keepalive_timeout 65;" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "    server {" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo \"        listen \${PORT_TO_USE};\" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo \"        listen [::]:\${PORT_TO_USE};\" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "        server_name _;" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "        root /var/www/html/public;" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "        index index.php index.html;" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "        charset utf-8;" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "        location / { try_files \$uri \$uri/ /index.php?\$query_string; }" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "        location ~ \\.php\$ { fastcgi_pass 127.0.0.1:9000; fastcgi_index index.php; include fastcgi_params; fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name; }" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "    }" >> /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'echo "}" >> /etc/nginx/nginx.conf' >> /start.sh && \
     echo 'php artisan config:clear' >> /start.sh && \
     echo 'php artisan cache:clear' >> /start.sh && \
     echo 'php artisan route:clear' >> /start.sh && \
