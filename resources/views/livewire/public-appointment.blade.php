@@ -315,4 +315,92 @@
         </div>
     </div>
     @endif
+    @if($showAlreadyScheduledModal)
+        <div
+            style="
+                position:fixed;
+                inset:0;
+                background:rgba(0,0,0,.75);
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                z-index:999999;
+                padding:20px;
+            "
+        >
+            <div
+                class="flow-modal"
+                style="
+                    width:100%;
+                    max-width:500px;
+                    background:white;
+                    border-radius:18px;
+                    padding:35px;
+                    text-align:center;
+                    box-shadow:0 20px 50px rgba(0,0,0,.25);
+                "
+            >
+
+                {{-- ICONO --}}
+                <div
+                    style="
+                        width:75px;
+                        height:75px;
+                        background:#fef3c7;
+                        color:#d97706;
+                        border-radius:50%;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        font-size:34px;
+                        margin:0 auto 20px;
+                    "
+                >
+                    !
+                </div>
+
+                {{-- TITULO --}}
+                <h2
+                    class="flow-modal-title"
+                    style="
+                        font-size:1.6rem;
+                        font-weight:bold;
+                        margin-bottom:15px;
+                    "
+                >
+                    {{ __('appointment.already_scheduled_title') }}
+                </h2>
+
+                {{-- MENSAJE --}}
+                <p
+                    style="
+                        font-size:1.1rem;
+                        line-height:1.6;
+                        color:#6b7280;
+                        margin-bottom:25px;
+                    "
+                >
+                    {{ __('appointment.already_scheduled_message') }}
+                </p>
+
+                {{-- BOTÓN --}}
+                <button
+                    wire:click="$set('showAlreadyScheduledModal', false)"
+                    class="flow-btn"
+                    style="
+                        width:100%;
+                        padding:14px;
+                        border:none;
+                        border-radius:10px;
+                        font-weight:bold;
+                        font-size:1rem;
+                        cursor:pointer;
+                    "
+                >
+                    {{ __('appointment.close') }}
+                </button>
+
+            </div>
+        </div>
+    @endif
 </div>

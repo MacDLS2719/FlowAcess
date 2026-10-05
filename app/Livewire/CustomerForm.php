@@ -21,7 +21,7 @@ class CustomerForm extends Component
         'Nombre' => 'required|string|max:255',
         'Telefono' => 'required|string|max:11',
         'Sexo' => 'required|string',
-        'Tipo' => 'required|in:Adulto,Niño',
+        'Tipo' => 'required|in:Adulto,Niño,Carnaval,Personalizado',
         'EstadoContable' => 'required|in:Pago,Debe',
     ];
 
@@ -42,6 +42,8 @@ class CustomerForm extends Component
         $codigo = match ($this->Tipo) {
             'Adulto' => 'ADUL-' . $customer->IdCustomer,
             'Niño' => 'NIN-' . $customer->IdCustomer,
+            'Carnaval' => 'CAR-' . $customer->IdCustomer,
+            'Personalizado' => 'PER-' . $customer->IdCustomer,
         };
 
         $customer->update([

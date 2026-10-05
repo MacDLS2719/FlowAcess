@@ -23,4 +23,6 @@ return [
     'share_email' => 'Compartir por Gmail',
     'print' => 'Imprimir / Captura',
     'close' => 'Cerrar',
+    'already_scheduled_title' => 'Cita activa',
+    'already_scheduled_message' => 'Ya tienes una cita activa. No puedes agendar una nueva cita en este momento.',
 ];

@@ -26,6 +26,10 @@ return [
 
     'child' => 'Niño',
 
+    'carnival' => 'Carnaval',
+
+    'custom' => 'Personalizado',
+
     'paid' => 'Pago',
 
     'pending' => 'Debe',

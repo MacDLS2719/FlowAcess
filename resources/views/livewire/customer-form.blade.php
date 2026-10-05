@@ -189,6 +189,8 @@
                     <option value="">{{ __('customer.select') }}</option>
                     <option value="Adulto">{{ __('customer.adult') }}</option>
                     <option value="Niño">{{ __('customer.child') }}</option>
+                    <option value="Carnaval">{{ __('customer.carnival') }}</option>
+                    <option value="Personalizado">{{ __('customer.custom') }}</option>
                 </select>
 
                 @error('Tipo')

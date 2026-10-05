@@ -34,7 +34,7 @@ class CustomerEntregaResource extends Resource
     {
         return parent::getEloquentQuery()
             ->whereHas('processes', function ($q) {
-                $q->where('Estado', 'Entregado');
+                $q->where('EstadoActual', 'Entregado');
             });
     }
 

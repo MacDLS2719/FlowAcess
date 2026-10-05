@@ -26,6 +26,10 @@ return [
 
     'child' => 'Child',
 
+    'carnival' => 'Carnival',
+
+    'custom' => 'Custom',
+
     'paid' => 'Paid',
 
     'pending' => 'Pending',

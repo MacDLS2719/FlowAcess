@@ -23,4 +23,6 @@ return [
     'share_email' => 'Share via Email',
     'print' => 'Print / Screenshot',
     'close' => 'Close',
+    'already_scheduled_title' => 'Active Appointment',
+    'already_scheduled_message' => 'You already have an active appointment. You cannot schedule a new appointment at this time.',
 ];

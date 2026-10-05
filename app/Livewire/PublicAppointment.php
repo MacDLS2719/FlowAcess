@@ -17,6 +17,7 @@ class PublicAppointment extends Component
     public $modoReagendar = false;
     public $appointmentActual;
     public $showModal = false;
+    public $showAlreadyScheduledModal = false;
     public $confirmData = [];
 
     public function validarCodigo()
@@ -53,7 +54,7 @@ class PublicAppointment extends Component
         // BLOQUEO
         // =========================
         if ($this->appointmentActual->Status === 'Agendada') {
-            $this->addError('codigo', 'Ya tienes una cita activa.');
+            $this->showAlreadyScheduledModal = true;
             return;
         }
 
