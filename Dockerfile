@@ -17,6 +17,10 @@ RUN apk add --no-cache \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd zip intl pdo pdo_mysql bcmath
 
+# Forzar a PHP-FPM a escuchar en el puerto TCP 9000 para que Nginx pueda comunicarse
+RUN sed -i 's/listen = 127.0.0.1:9000/listen = 9000/g' /usr/local/etc/php-fpm.d/www.conf || \
+    sed -i 's/listen = .*/listen = 9000/g' /usr/local/etc/php-fpm.d/www.conf
+
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
