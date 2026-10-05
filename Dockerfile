@@ -18,9 +18,9 @@ RUN apk add --no-cache \
     && docker-php-ext-install -j$(nproc) gd zip intl pdo pdo_mysql bcmath
 
 # Forzar a PHP-FPM (en Alpine) a escuchar en el puerto TCP 9000
-RUN sed -i 's/listen = 127.0.0.1:9000/listen = 9000/g' /etc/php82/php-fpm.d/www.conf || \
-    sed -i 's/listen = 127.0.0.1:9000/listen = 9000/g' /etc/php8/php-fpm.d/www.conf || \
-    sed -i 's/listen = .*/listen = 9000/g' /etc/php-fpm.d/www.conf || true
+RUN echo "listen = 9000" >> /etc/php82/php-fpm.d/zz-docker.conf 2>/dev/null || \
+    echo "listen = 9000" >> /etc/php8/php-fpm.d/zz-docker.conf 2>/dev/null || \
+    echo "listen = 9000" >> /usr/local/etc/php-fpm.d/zz-docker.conf 2>/dev/null || true
 
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
