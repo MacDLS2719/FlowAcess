@@ -46,11 +46,8 @@ RUN mkdir -p /run/nginx
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
 
-# Crear el script de inicio para manejar el puerto dinámico y limpiar caché en caliente
+# Crear el script de inicio de forma limpia y directa
 RUN echo '#!/bin/sh' > /start.sh && \
-    echo 'PORT_TO_USE="${PORT:-8080}"' >> /start.sh && \
-    echo 'sed -i "s/listen 80;/listen ${PORT_TO_USE};/g" /etc/nginx/nginx.conf' >> /start.sh && \
-    echo 'sed -i "s/listen \\[::\\]:80;/listen [::]:${PORT_TO_USE};/g" /etc/nginx/nginx.conf' >> /start.sh && \
     echo 'php artisan config:clear' >> /start.sh && \
     echo 'php artisan cache:clear' >> /start.sh && \
     echo 'php artisan route:clear' >> /start.sh && \
