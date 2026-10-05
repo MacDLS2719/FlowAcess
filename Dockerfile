@@ -30,7 +30,7 @@ WORKDIR /var/www/html
 # Copiar archivos del proyecto
 COPY . .
 
-# Instalar dependencias de Composer ignorando alertas problemáticas de seguridad
+# Instalar dependencias de Composer
 ENV COMPOSER_ALLOW_SUPERUSER=1
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 
@@ -46,8 +46,11 @@ RUN mkdir -p /run/nginx
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
 
-# Crear el script de inicio de forma limpia y directa
+# Crear el script de inicio dinámico para Railway
 RUN echo '#!/bin/sh' > /start.sh && \
+    echo 'PORT_TO_USE="${PORT:-8080}"' >> /start.sh && \
+    echo 'sed -i "s/listen [0-9]\+;/listen ${PORT_TO_USE};/g" /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'sed -i "s/listen \[[::\]]:[0-9]\+;/listen [::]:${PORT_TO_USE};/g" /etc/nginx/nginx.conf' >> /start.sh && \
     echo 'php artisan config:clear' >> /start.sh && \
     echo 'php artisan cache:clear' >> /start.sh && \
     echo 'php artisan route:clear' >> /start.sh && \
