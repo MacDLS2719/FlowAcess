@@ -35,11 +35,19 @@ RUN npm install && npm run build
 # Configurar permisos para Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Configurar Nginx y Supervisor para correr la app en el puerto que pide Render
+# Configurar Nginx y Supervisor
 RUN mkdir -p /run/nginx
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
 
-EXPOSE 80
+# Crear automáticamente el script de inicio para soportar el puerto dinámico de Railway
+RUN echo '#!/bin/sh' > /start.sh && \
+    echo 'PORT_TO_USE="${PORT:-8080}"' >> /start.sh && \
+    echo 'sed -i "s/listen 80;/listen ${PORT_TO_USE};/g" /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'sed -i "s/listen \\[::\\]:80;/listen [::]:${PORT_TO_USE};/g" /etc/nginx/nginx.conf' >> /start.sh && \
+    echo 'exec /usr/bin/supervisord -c /etc/supervisord.conf' >> /start.sh && \
+    chmod +x /start.sh
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+EXPOSE 8080
+
+CMD ["/start.sh"]
