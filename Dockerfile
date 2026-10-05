@@ -17,9 +17,10 @@ RUN apk add --no-cache \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd zip intl pdo pdo_mysql bcmath
 
-# Forzar a PHP-FPM a escuchar en el puerto TCP 9000 para que Nginx pueda comunicarse
-RUN sed -i 's/listen = 127.0.0.1:9000/listen = 9000/g' /usr/local/etc/php-fpm.d/www.conf || \
-    sed -i 's/listen = .*/listen = 9000/g' /usr/local/etc/php-fpm.d/www.conf
+# Forzar a PHP-FPM (en Alpine) a escuchar en el puerto TCP 9000
+RUN sed -i 's/listen = 127.0.0.1:9000/listen = 9000/g' /etc/php82/php-fpm.d/www.conf || \
+    sed -i 's/listen = 127.0.0.1:9000/listen = 9000/g' /etc/php8/php-fpm.d/www.conf || \
+    sed -i 's/listen = .*/listen = 9000/g' /etc/php-fpm.d/www.conf || true
 
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -35,6 +36,11 @@ RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 
 # Instalar dependencias de Node y compilar assets (Vite/Filament)
 RUN npm install && npm run build
+
+# Limpiar y optimizar cachés de Laravel
+RUN php artisan config:clear && \
+    php artisan route:clear && \
+    php artisan view:clear
 
 # Configurar permisos para Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
