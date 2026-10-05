@@ -1,9 +1,7 @@
-FROM php:8.2-fpm-alpine
+FROM php:8.2-apache-alpine
 
-# Instalar dependencias del sistema y extensiones de PHP requeridas por Filament
+# Instalar dependencias del sistema y extensiones requeridas por Filament
 RUN apk add --no-cache \
-    nginx \
-    supervisor \
     curl \
     libpng-dev \
     libjpeg-turbo-dev \
@@ -17,10 +15,9 @@ RUN apk add --no-cache \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd zip intl pdo pdo_mysql bcmath
 
-# Forzar a PHP-FPM a escuchar en el puerto TCP 9000
-RUN echo "listen = 127.0.0.1:9000" > /usr/local/etc/php-fpm.d/zz-docker.conf || \
-    echo "listen = 127.0.0.1:9000" > /etc/php82/php-fpm.d/zz-docker.conf || \
-    echo "listen = 127.0.0.1:9000" > /etc/php8/php-fpm.d/zz-docker.conf || true
+# Configurar el DocumentRoot de Apache para apuntar a la carpeta public de Laravel
+RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/httpd.conf
+RUN sed -i 's!AllowOverride None!AllowOverride All!g' /etc/apache2/httpd.conf
 
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -37,22 +34,20 @@ RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 # Instalar dependencias de Node y compilar assets
 RUN npm install && npm run build
 
-# Configurar permisos iniciales para Laravel
+# Permisos
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
     chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Configurar Nginx y Supervisor
-RUN mkdir -p /run/nginx
-COPY docker/nginx.conf /etc/nginx/nginx.conf
-COPY docker/supervisord.conf /etc/supervisord.conf
-
-# Script de inicio limpio
+# Script de inicio para adaptar Apache al puerto dinámico de Railway ($PORT)
 RUN echo '#!/bin/sh' > /start.sh && \
+    echo 'PORT_TO_USE="${PORT:-8080}"' >> /start.sh && \
+    echo 'sed -i "s/Listen 80/Listen ${PORT_TO_USE}/g" /etc/apache2/httpd.conf' >> /start.sh && \
+    echo 'sed -i "s/:80/:${PORT_TO_USE}/g" /etc/apache2/conf.d/*.conf 2>/dev/null || true' >> /start.sh && \
     echo 'php artisan config:clear' >> /start.sh && \
     echo 'php artisan cache:clear' >> /start.sh && \
     echo 'php artisan route:clear' >> /start.sh && \
     echo 'php artisan view:clear' >> /start.sh && \
-    echo 'exec /usr/bin/supervisord -c /etc/supervisord.conf' >> /start.sh && \
+    echo 'exec httpd -D FOREGROUND' >> /start.sh && \
     chmod +x /start.sh
 
 EXPOSE 8080
