@@ -18,9 +18,9 @@ RUN apk add --no-cache \
     && docker-php-ext-install -j$(nproc) gd zip intl pdo pdo_mysql bcmath
 
 # Forzar a PHP-FPM a escuchar en el puerto TCP 9000
-RUN echo "listen = 9000" >> /etc/php82/php-fpm.d/zz-docker.conf 2>/dev/null || \
-    echo "listen = 9000" >> /etc/php8/php-fpm.d/zz-docker.conf 2>/dev/null || \
-    echo "listen = 9000" >> /usr/local/etc/php-fpm.d/zz-docker.conf 2>/dev/null || true
+RUN echo "listen = 127.0.0.1:9000" > /usr/local/etc/php-fpm.d/zz-docker.conf || \
+    echo "listen = 127.0.0.1:9000" > /etc/php82/php-fpm.d/zz-docker.conf || \
+    echo "listen = 127.0.0.1:9000" > /etc/php8/php-fpm.d/zz-docker.conf || true
 
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
