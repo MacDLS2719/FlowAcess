@@ -35,6 +35,9 @@ class GeneralPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/General/Pages'), for: 'App\\Filament\\General\\Pages')
             ->pages([
                 Pages\Dashboard::class,
+                \App\Filament\Pages\AgendaCalendario::class,
+                \App\Filament\Pages\CustomerTracking::class,
+                \App\Filament\Pages\Reportes::class,
             ])
             ->discoverWidgets(in: app_path('Filament/General/Widgets'), for: 'App\\Filament\\General\\Widgets')
             ->widgets([
@@ -53,6 +56,9 @@ class GeneralPanelProvider extends PanelProvider
             ])
             ->resources([
                 \App\Filament\Resources\UserResource::class,
+                \App\Filament\Resources\AvailabilityResource::class,
+                \App\Filament\Resources\CustomerResource::class,
+                \App\Filament\Resources\CustomerEntregaResource::class,
             ])
             ->authMiddleware([
                 'role:General', 
