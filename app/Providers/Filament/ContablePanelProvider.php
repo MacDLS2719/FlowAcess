@@ -26,10 +26,10 @@ class ContablePanelProvider extends PanelProvider
             ->id('contable')
             ->path('contable')
             ->login()
-            ->brandName('FlowAccess')
-            ->favicon(asset('images/user.png'))
+            ->brandName('Martina’s Closets')
+            ->favicon(asset('images/logo.png'))
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Cyan,
             ])
             ->discoverResources(in: app_path('Filament/Contable/Resources'), for: 'App\\Filament\\Contable\\Resources')
             ->discoverPages(in: app_path('Filament/Contable/Pages'), for: 'App\\Filament\\Contable\\Pages')

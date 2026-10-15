@@ -26,10 +26,10 @@ class GeneralPanelProvider extends PanelProvider
             ->id('general')
             ->path('general')
             ->login()
-            ->brandName('FlowAccess')
-            ->favicon(asset('images/user.png'))
+            ->brandName('Martina’s Closets')
+            ->favicon(asset('images/logo.png'))
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Cyan,
             ])
             ->discoverResources(in: app_path('Filament/General/Resources'), for: 'App\\Filament\\General\\Resources')
             ->discoverPages(in: app_path('Filament/General/Pages'), for: 'App\\Filament\\General\\Pages')

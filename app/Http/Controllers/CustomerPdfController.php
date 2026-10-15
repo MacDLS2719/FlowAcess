@@ -10,7 +10,7 @@ class CustomerPdfController
 {
     public function generate(Customer $customer)
     {
-        $urlAgendamiento = 'https://flowaccess.onrender.com/agendamiento';
+        $urlAgendamiento = 'https://flowacess-production.up.railway.app/agendamiento';
 
         $qrCode = base64_encode(QrCode::format('svg')->size(200)->generate($urlAgendamiento));
 

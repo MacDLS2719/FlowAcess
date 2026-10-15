@@ -231,7 +231,7 @@
                 style="
                     width:100%;
                     padding:14px;
-                    background:#F59E0B;
+                    background:#06b6d4;
                     color:white;
                     border:none;
                     border-radius:10px;
@@ -239,8 +239,8 @@
                     cursor:pointer;
                     transition:.3s;
                 "
-                onmouseover="this.style.background='#D97706'"
-                onmouseout="this.style.background='#F59E0B'"
+                onmouseover="this.style.background='#0891b2'"
+                onmouseout="this.style.background='#06b6d4'"
             >
                 {{ __('customer.save') }}
             </button>

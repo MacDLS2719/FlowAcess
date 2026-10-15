@@ -83,7 +83,18 @@ class AgendaCalendario extends Page
         $startOfMonth = Carbon::createFromDate($this->currentYear, $this->currentMonth, 1);
         $endOfMonth = $startOfMonth->copy()->endOfMonth();
 
-        $availabilities = Availability::with('appointments.customer')
+        $availabilities = Availability::query()
+            ->select(['IdAvailability', 'AvailableDate', 'AvailableTime', 'Status'])
+            ->with([
+                'appointments' => fn ($query) => $query->select([
+                    'IdAppointment',
+                    'IdAvailability',
+                    'IdCustomer',
+                ]),
+                'appointments.customer' => fn ($query) => $query->select([
+                    'IdCustomer',
+                ]),
+            ])
             ->whereBetween('AvailableDate', [
                 $startOfMonth->format('Y-m-d'),
                 $endOfMonth->format('Y-m-d')
@@ -119,10 +130,7 @@ class AgendaCalendario extends Page
     // =========================
     public function openModal(int $customerId, bool $edit = false): void
     {
-        $this->customer = Customer::with([
-            'processes.histories.user',
-            'appointments.availability',
-        ])->findOrFail($customerId);
+        $this->customer = Customer::findOrFail($customerId);
 
         $this->editMode = $edit;
 
@@ -130,14 +138,18 @@ class AgendaCalendario extends Page
         $this->Observacion = '';
 
         // Historial
-        $process = $this->customer->processes->first();
+        $process = $this->customer->processes()->first();
 
         $this->histories = $process
-            ? $process->histories()->with('user')->latest()->get()
+            ? $process->histories()
+                ->latest()
+                ->get(['idHistory', 'idProcess', 'Estado', 'Observacion', 'created_at'])
             : new Collection();
 
         // Appointment
-        $this->appointment = $this->customer->appointments->first();
+        $this->appointment = $this->customer->appointments()
+            ->with('availability')
+            ->first();
 
         $this->hasAppointment = $this->appointment !== null;
 

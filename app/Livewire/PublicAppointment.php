@@ -6,13 +6,13 @@ use Livewire\Component;
 use App\Models\Customer;
 use App\Models\Appointment;
 use App\Models\Availability;
+use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class PublicAppointment extends Component
 {
     public $codigo;
     public $customer;
-    public $fechaSeleccionada;
-    public $horarioSeleccionado;
     public $mostrarAgenda = false;
     public $modoReagendar = false;
     public $appointmentActual;
@@ -65,9 +65,9 @@ class PublicAppointment extends Component
         }
     }
 
-    public function guardarCita()
+    public function guardarCita(int $availabilityId)
     {
-        $availability = Availability::find($this->horarioSeleccionado);
+        $availability = Availability::find($availabilityId);
 
         if (! $availability || $availability->Status == 1) {
             $this->addError('horario', 'Horario no disponible.');
@@ -120,28 +120,32 @@ class PublicAppointment extends Component
 
     public function render()
     {
-        $fechas = Availability::where('Status', 0)
-            ->select('AvailableDate')
-            ->distinct()
-            ->orderBy('AvailableDate')
-            ->get();
+        $agendaOptions = collect();
 
-        $horarios = [];
+        if ($this->mostrarAgenda && $this->customer) {
+            $agendaOptions = Availability::where('Status', 0)
+                ->orderBy('AvailableDate')
+                ->orderBy('AvailableTime')
+                ->get(['IdAvailability', 'AvailableDate', 'AvailableTime'])
+                ->groupBy(fn (Availability $availability) => $availability->AvailableDate->format('Y-m-d'))
+                ->map(function (Collection $slots, string $date) {
+                    $parsedDate = Carbon::parse($date);
 
-        if ($this->fechaSeleccionada) {
-
-            $horarios = Availability::where(
-                'AvailableDate',
-                $this->fechaSeleccionada
-            )
-            ->where('Status', 0)
-            ->orderBy('AvailableTime')
-            ->get();
+                    return [
+                        'value' => $date,
+                        'label' => $parsedDate->format('d M'),
+                        'weekday' => ucfirst($parsedDate->translatedFormat('l')),
+                        'slots' => $slots->map(fn (Availability $availability) => [
+                            'id' => $availability->IdAvailability,
+                            'label' => Carbon::parse($availability->AvailableTime)->format('H:i'),
+                        ])->values(),
+                    ];
+                })
+                ->values();
         }
 
         return view('livewire.public-appointment', [
-            'fechas' => $fechas,
-            'horarios' => $horarios,
+            'agendaOptions' => $agendaOptions,
         ])
         ->layout('appointment');
     }

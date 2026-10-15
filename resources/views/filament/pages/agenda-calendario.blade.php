@@ -1,4 +1,15 @@
 <x-filament-panels::page>
+    <style>
+        .agenda-calendar-save {
+            background-color: #0891b2;
+            color: #fff;
+        }
+
+        .agenda-calendar-save:hover {
+            background-color: #0e7490;
+        }
+    </style>
+
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 dark:bg-gray-900 dark:border-gray-800">
 
         {{-- ================= HEADER ================= --}}
@@ -114,8 +125,17 @@
     </div>
 
     {{-- ================= MODAL ================= --}}
+    <div wire:loading.flex wire:target="openModal"
+        class="fixed inset-0 items-center justify-center z-[60]"
+        style="background-color: rgba(0, 0, 0, 0.75); backdrop-filter: blur(2px);">
+        <div class="rounded-lg bg-white dark:bg-gray-900 px-6 py-4 text-gray-900 dark:text-white shadow-xl">
+            Cargando información...
+        </div>
+    </div>
+
     @if($showModal)
-        <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+        <div data-agenda-modal class="fixed inset-0 flex items-center justify-center z-50"
+            style="background-color: rgba(0, 0, 0, 0.75); backdrop-filter: blur(2px);">
 
             <div class="bg-white dark:bg-gray-900 w-[95%] max-w-6xl rounded-xl shadow-xl p-6 overflow-y-auto max-h-[90vh]">
 
@@ -125,7 +145,9 @@
                         Cliente: {{ $customer?->CodigoCustomer }}
                     </h2>
 
-                    <button wire:click="closeModal" class="text-gray-500 hover:text-red-500 text-xl">
+                    <button wire:click="closeModal"
+                        x-on:click="$el.closest('[data-agenda-modal]').classList.add('hidden')"
+                        class="text-gray-500 hover:text-red-500 text-xl">
                         ✖
                     </button>
                 </div>
@@ -208,7 +230,7 @@
                 @if($editMode)
                     <div class="mt-6 flex justify-end">
                         <button wire:click="save"
-                            class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-2 rounded-lg">
+                            class="agenda-calendar-save px-6 py-2 rounded-lg transition">
                             Guardar Cambios
                         </button>
                     </div>

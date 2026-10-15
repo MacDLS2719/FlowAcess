@@ -3,8 +3,8 @@
 
     <head>
         <meta charset="UTF-8">
-        <title>{{ __('customer.app_name') }}</title>
-        <link rel="icon" href="{{ asset('images/user.png') }}">
+        <title>{{ __('Martina’s Closets') }}</title>
+        <link rel="icon" href="{{ asset('images/logo.png') }}">
         @livewireStyles
     </head>
 
@@ -77,7 +77,7 @@
     ">
 
     <h1 id="title">
-        {{ __('customer.app_name') }}
+        {{ __('Martina’s Closets') }}
     </h1>
 
     <p id="subtitle" style="color:#6B7280;">

@@ -28,7 +28,7 @@
         }
 
         .code{
-            color:#0d6efd;
+            color: #000000;
             font-size:20px;
             font-weight:bold;
         }
@@ -61,7 +61,7 @@
     <div class="header">
 
         <div class="title">
-            FLOWACCESS
+            Martina’s Closets
         </div>
 
         <br>
@@ -119,7 +119,7 @@
     </div>
     
     <div class="footer">
-        Documento generado automáticamente por FLOWACCESS
+        Documento generado automáticamente por Martina’s Closets
     </div>
 
 </div>

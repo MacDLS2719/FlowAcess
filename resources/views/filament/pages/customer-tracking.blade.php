@@ -1,4 +1,20 @@
 <x-filament-panels::page>
+    <style>
+        .customer-tracking-input:focus {
+            border-color: #0891b2;
+            box-shadow: 0 0 0 2px rgba(8, 145, 178, 0.2);
+            outline: none;
+        }
+
+        .customer-tracking-save {
+            background-color: #0891b2;
+            color: #fff;
+        }
+
+        .customer-tracking-save:hover {
+            background-color: #0e7490;
+        }
+    </style>
 
     {{-- Filtros --}}
     <x-filament::section>
@@ -22,6 +38,7 @@
                     placeholder="Ej: ADUL-1"
                     class="
                         w-full
+                        customer-tracking-input
                         rounded-lg
                         border
                         border-gray-300
@@ -32,9 +49,6 @@
                         text-gray-900
                         placeholder-gray-400
                         shadow-sm
-                        focus:border-primary-500
-                        focus:ring-2
-                        focus:ring-primary-500
                         dark:border-gray-700
                         dark:bg-gray-900
                         dark:text-white
@@ -57,6 +71,7 @@
                     placeholder="Nombre del cliente"
                     class="
                         w-full
+                        customer-tracking-input
                         rounded-lg
                         border
                         border-gray-300
@@ -67,9 +82,6 @@
                         text-gray-900
                         placeholder-gray-400
                         shadow-sm
-                        focus:border-primary-500
-                        focus:ring-2
-                        focus:ring-primary-500
                         dark:border-gray-700
                         dark:bg-gray-900
                         dark:text-white
@@ -90,6 +102,7 @@
                     wire:model.live="estado"
                     class="
                         w-full
+                        customer-tracking-input
                         rounded-lg
                         border
                         border-gray-300
@@ -99,9 +112,6 @@
                         text-sm
                         text-gray-900
                         shadow-sm
-                        focus:border-primary-500
-                        focus:ring-2
-                        focus:ring-primary-500
                         dark:border-gray-700
                         dark:bg-gray-900
                         dark:text-white
@@ -249,7 +259,7 @@
 
                                 <x-filament::button
                                     size="sm"
-                                    color="gray"
+                                    color="primary"
                                     wire:click="openModal({{ $customer->IdCustomer }}, false)"
                                 >
                                     Ver
@@ -257,7 +267,7 @@
 
                                 <x-filament::button
                                     size="sm"
-                                    color="warning"
+                                    color="primary"
                                     wire:click="openModal({{ $customer->IdCustomer }}, true)"
                                 >
                                     Editar
@@ -290,9 +300,10 @@
 
             @if($showModal)
 
-            <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div class="fixed inset-0 flex items-center justify-center z-50 p-4"
+                style="background-color: rgba(0, 0, 0, 0.75); backdrop-filter: blur(2px);">
 
-                <div class="bg-white dark:bg-gray-900 w-[95%] max-w-6xl rounded-xl shadow-xl p-6 overflow-y-auto max-h-[90vh]">
+                <div class="bg-white dark:bg-gray-900 w-[95%] max-w-6xl rounded-xl shadow-xl p-6 overflow-y-auto max-h-[90vh] border-t-4 border-cyan-500">
 
                     {{-- HEADER --}}
                     <div class="flex justify-between items-center mb-4">
@@ -457,7 +468,7 @@
 
                                 <button
                                     wire:click="save"
-                                    class="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition"
+                                    class="customer-tracking-save font-semibold px-6 py-3 rounded-lg shadow-md transition"
                                 >
                                     Guardar Cambios
                                 </button>
@@ -467,6 +478,14 @@
                 </div>              
             </div>
             @endif
+
+            <div wire:loading.flex wire:target="openModal"
+                class="fixed inset-0 items-center justify-center z-[60]"
+                style="background-color: rgba(0, 0, 0, 0.75); backdrop-filter: blur(2px);">
+                <div class="rounded-lg bg-white dark:bg-gray-900 px-6 py-4 text-gray-900 dark:text-white shadow-xl">
+                    Cargando información...
+                </div>
+            </div>
         </div>
 
     </x-filament::section>

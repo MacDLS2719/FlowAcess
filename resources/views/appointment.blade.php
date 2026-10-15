@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ __('customer.app_name') ?? 'Agendamiento de Citas' }}</title>
+    <title>{{ __('Martina’s Closets') ?? 'Agendamiento de Citas' }}</title>
 
-    <link rel="icon" href="{{ asset('images/user.png') }}">
+    <link rel="icon" href="{{ asset('images/logo.png') }}">
 
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -53,7 +53,7 @@
         <div class="text-center mb-6">
 
             <h1 id="title" class="text-2xl font-bold">
-                {{ __('customer.app_name') ?? 'Agendamiento de Citas' }}
+                {{ __('Martina’s Closets') ?? 'Agendamiento de Citas' }}
             </h1>
 
             <p id="subtitle" class="text-gray-500">

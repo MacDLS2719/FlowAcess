@@ -1,6 +1,10 @@
 <div>
 
     <style>
+        [x-cloak] {
+            display: none !important;
+        }
+
         body[data-theme="dark"] .flow-card{
             background:#1F2937 !important;
             color:white !important;
@@ -50,17 +54,17 @@
             color:#F9FAFB;
         }
         .flow-btn {
-            background:#F59E0B;
+            background:#0891b2;
             color:white;
             transition:.3s;
         }
         .flow-btn:hover {
-            background:#D97706;
+            background:#0e7490;
         }
         .flow-info-box {
-            background: #fffbeb;
-            border: 1px solid #fde68a;
-            color: #92400e;
+            background: #ecfeff;
+            border: 1px solid #a5f3fc;
+            color: #155e75;
         }
         body[data-theme="dark"] .flow-info-box {
             background: #374151;
@@ -73,9 +77,9 @@
             border: 1px solid #d1d5db;
         }
         .flow-select-btn.active {
-            background: #F59E0B !important;
+            background: #0891b2 !important;
             color: white !important;
-            border-color: #F59E0B !important;
+            border-color: #0891b2 !important;
         }
         body[data-theme="dark"] .flow-select-btn:not(.active) {
             background: #374151;
@@ -97,7 +101,7 @@
         "
     >
         <h2 style="margin-bottom:10px;text-align:center; font-size: 1.5rem; font-weight: bold;">
-            FlowAccess
+            Martina’s Closets
         </h2>
         <p style="text-align:center; margin-bottom: 25px; color: #6b7280;">
             {{ __('appointment.portal_title') }}
@@ -153,6 +157,7 @@
 
         {{-- ================= AGENDA ================= --}}
         @if ($mostrarAgenda && $customer)
+            <div x-data="{ fechas: @js($agendaOptions), fechaSeleccionada: null, horarioSeleccionado: null }">
             {{-- INFO CLIENTE --}}
             <div class="flow-info-box" style="margin-bottom: 20px; padding: 20px; border-radius: 10px;">
                 <h3 style="font-weight: bold; margin-bottom: 15px;">{{ __('appointment.your_info') }}</h3>
@@ -168,10 +173,12 @@
             <div style="margin-bottom: 20px;">
                 <h3 style="font-weight: bold; margin-bottom: 15px;">{{ __('appointment.select_date') }}</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px;">
-                    @foreach($fechas as $fecha)
+                    <template x-for="fecha in fechas" :key="fecha.value">
                         <button
-                            wire:click="$set('fechaSeleccionada','{{ $fecha->AvailableDate }}')"
-                            class="flow-select-btn {{ $fechaSeleccionada == $fecha->AvailableDate ? 'active' : '' }}"
+                            type="button"
+                            x-on:click="fechaSeleccionada = fecha.value; horarioSeleccionado = null"
+                            class="flow-select-btn"
+                            :class="{ 'active': fechaSeleccionada === fecha.value }"
                             style="
                                 padding: 12px;
                                 border-radius: 10px;
@@ -183,40 +190,44 @@
                                 justify-content: center;
                             "
                         >
-                            <span style="font-weight: bold;">{{ \Carbon\Carbon::parse($fecha->AvailableDate)->format('d M') }}</span>
-                            <span style="font-size: 0.75rem; margin-top: 4px; opacity: 0.8;">{{ ucfirst(\Carbon\Carbon::parse($fecha->AvailableDate)->translatedFormat('l')) }}</span>
+                            <span style="font-weight: bold;" x-text="fecha.label"></span>
+                            <span style="font-size: 0.75rem; margin-top: 4px; opacity: 0.8;" x-text="fecha.weekday"></span>
                         </button>
-                    @endforeach
+                    </template>
                 </div>
             </div>
 
             {{-- HORARIOS --}}
-            @if($fechaSeleccionada)
-                <div style="margin-bottom: 25px;">
+            <div x-cloak x-show="fechaSeleccionada !== null" style="margin-bottom: 25px;">
                     <h3 style="font-weight: bold; margin-bottom: 15px;">{{ __('appointment.select_time') }}</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 10px;">
-                        @foreach($horarios as $horario)
+                        <template x-for="horario in (fechas.find(fecha => fecha.value === fechaSeleccionada)?.slots ?? [])" :key="horario.id">
                             <button
-                                wire:click="$set('horarioSeleccionado','{{ $horario->IdAvailability }}')"
-                                class="flow-select-btn {{ $horarioSeleccionado == $horario->IdAvailability ? 'active' : '' }}"
+                                type="button"
+                                x-on:click="horarioSeleccionado = horario.id"
+                                class="flow-select-btn"
+                                :class="{ 'active': horarioSeleccionado === horario.id }"
                                 style="
                                     padding: 12px;
                                     border-radius: 10px;
                                     cursor: pointer;
                                     transition: .2s;
                                 "
-                            >
-                                {{ \Carbon\Carbon::parse($horario->AvailableTime)->format('H:i') }}
-                            </button>
-                        @endforeach
+                                x-text="horario.label"
+                            ></button>
+                        </template>
                     </div>
                 </div>
-            @endif
 
             {{-- BOTÓN --}}
-            @if($horarioSeleccionado)
+            @error('horario')
+                <small style="color:#ef4444; display: block; margin-bottom: 10px;">{{ $message }}</small>
+            @enderror
+            <div x-cloak x-show="horarioSeleccionado !== null">
                 <button
-                    wire:click="guardarCita"
+                    x-on:click="$wire.guardarCita(horarioSeleccionado)"
+                    wire:loading.attr="disabled"
+                    wire:target="guardarCita"
                     class="flow-btn"
                     style="
                         width:100%;
@@ -230,7 +241,8 @@
                 >
                     {{ __('appointment.confirm_btn') }}
                 </button>
-            @endif
+            </div>
+            </div>
         @endif
 
     </div>
@@ -268,7 +280,7 @@
                 {{ __('appointment.confirmed_title') }}
             </h2>
 
-            <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid #F59E0B; border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: left;">
+            <div style="background: rgba(8, 145, 178, 0.1); border: 1px solid #0891b2; border-radius: 10px; padding: 15px; margin-bottom: 20px; text-align: left;">
                 <p style="margin-bottom: 5px;"><b>{{ __('appointment.name') }}:</b> <span>{{ $confirmData['nombre'] ?? '' }}</span></p>
                 <p style="margin-bottom: 5px;"><b>{{ __('appointment.code') }}:</b> <span>{{ $confirmData['codigo'] ?? '' }}</span></p>
                 <p style="margin-bottom: 5px;"><b>{{ __('appointment.date') }}:</b> <span>{{ $confirmData['fecha'] ?? '' }}</span></p>
@@ -346,8 +358,8 @@
                     style="
                         width:75px;
                         height:75px;
-                        background:#fef3c7;
-                        color:#d97706;
+                        background:#cffafe;
+                        color:#0e7490;
                         border-radius:50%;
                         display:flex;
                         align-items:center;
